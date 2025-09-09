@@ -2,6 +2,12 @@ use anchor_lang::prelude::*;
 
 declare_id!("99oQb2on2BgNb6Sg2VXWiBXmQoxQWi2CScT3K5UYQJ4K");
 
+#[error_code]
+pub enum ErrorCode {
+    #[msg("Unauthorized: Only the admin can perform this action")]
+    Unauthorized,
+}
+
 #[program]
 pub mod security_best_practices {
     use super::*;
@@ -25,21 +31,21 @@ pub mod security_best_practices {
         Ok(())
     }
 
-    // pub fn update_config_good(ctx: Context<UpdateConfig>, data: u8) -> Result<()> {
-    //     // Check if admin is signer (existing check)
-    //     if !ctx.accounts.admin.is_signer {
-    //         return Err(ProgramError::MissingRequiredSignature.into());
-    //     }
+    pub fn update_config_good(ctx: Context<UpdateConfig>, data: u8) -> Result<()> {
+        // Check if admin is signer (existing check)
+        if !ctx.accounts.admin.is_signer {
+            return Err(ProgramError::MissingRequiredSignature.into());
+        }
         
-    //     // MISSING: Check if signer is the authorized admin
-    //     if ctx.accounts.admin.key() != ctx.accounts.config.admin {
-    //         return Err(ErrorCode::Unauthorized.into());
-    //     }
+        // MISSING: Check if signer is the authorized admin
+        if ctx.accounts.admin.key() != ctx.accounts.config.admin {
+            return Err(ErrorCode::Unauthorized.into());
+        }
         
-    //     let config = &mut ctx.accounts.config;
-    //     config.value = data;
-    //     Ok(())
-    // }
+        let config = &mut ctx.accounts.config;
+        config.value = data;
+        Ok(())
+    }
 }
 
 #[account]
