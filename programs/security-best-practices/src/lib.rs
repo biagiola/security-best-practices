@@ -22,6 +22,10 @@ pub mod security_best_practices {
 
     pub fn update_config_bad(ctx: Context<UpdateConfig>, data: u8) -> Result<()> {
         msg!("Greetings update_config_bad: {:?}", ctx.program_id);
+        msg!("ctx.accounts.config", ctx.accounts.config);
+        msg!("ctx.accounts.admin", ctx.accounts.admin);
+        msg!("ctx.accounts.andrew", ctx.accounts.andrew);
+
         if !ctx.accounts.admin.is_signer {
             return Err(ProgramError::MissingRequiredSignature.into());
         }
@@ -29,6 +33,12 @@ pub mod security_best_practices {
         let config = &mut ctx.accounts.config;
         config.value = data;
         Ok(())
+
+        // The problem here is that the function only checks if someone signed,
+        // but not who signed. Any random person who signs the transaction can
+        // update the config, as long as they pass their public key as the admin
+        // account. The program doesn't verify if that signer is actually the
+        // authorized admin stored in the config account.
     }
 
     pub fn update_config_good(ctx: Context<UpdateConfig>, data: u8) -> Result<()> {

@@ -40,7 +40,7 @@ describe("security-best-practices", () => {
     let maliciousKeypair: Keypair;
     let configPDA: PublicKey;
 
-    beforeEach(async () => {
+    before(async () => {
       // Create fresh keypairs for each test
       adminKeypair = Keypair.generate();
       maliciousKeypair = Keypair.generate();
@@ -53,7 +53,7 @@ describe("security-best-practices", () => {
       await provider.connection.requestAirdrop(maliciousKeypair.publicKey, 2 * anchor.web3.LAMPORTS_PER_SOL);
 
       // Wait for airdrops to confirm
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Initialize config with admin
       const result = await initializeConfig(adminKeypair.publicKey, adminKeypair);
@@ -79,7 +79,7 @@ describe("security-best-practices", () => {
     });
 
     it("VULNERABILITY: Should allow ANY signer to update config (this is the bug!)", async () => {
-      // This test demonstrates the vulnerability - any signer can update the config
+      // This test demonstrates the vulnerability - any person can sign to update the config
       // even if they're not the authorized admin
       
       console.log("🔍 Testing vulnerability with malicious user...");
